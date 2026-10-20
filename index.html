@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#040504" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>BI-WEEKLY // GROCERY LEDGER</title>
+  <style>
+    @font-face {
+      font-family: 'Gibbed';
+      src: local('Gibbed'), url('./Gibbed.otf') format('opentype'), url('./Gibbed.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    :root {
+      --black: #040504;
+      --slate: #6A6E79;
+      --white: #F5F5F5;
+      --font-main: 'Gibbed', 'Courier New', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--black);
+      color: var(--white);
+      font-family: var(--font-main);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 430px;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--black);
+      border-left: 1px solid var(--slate);
+      border-right: 1px solid var(--slate);
+      position: relative;
+    }
+
+    /* TOP ARCHITECTURAL HEADER */
+    .top-bar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      border-bottom: 2px solid var(--slate);
+      padding: 12px 16px;
+      background: var(--black);
+    }
+
+    .brand-block {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .micro-label {
+      font-size: 10px;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      color: var(--slate);
+    }
+
+    .app-title {
+      font-size: 19px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--white);
+    }
+
+    .mode-tabs {
+      display: flex;
+      border: 1px solid var(--slate);
+      align-self: center;
+    }
+
+    .tab-btn {
+      background: var(--black);
+      color: var(--slate);
+      border: none;
+      padding: 7px 10px;
+      font-family: var(--font-main);
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background: var(--white);
+      color: var(--black);
+      font-weight: bold;
+    }
+
+    /* LIVE TOTAL TICKER */
+    .summary-ticker {
+      display: grid;
+      grid-template-columns: 1.25fr 1fr;
+      border-bottom: 1px solid var(--slate);
+      background: var(--white);
+      color: var(--black);
+    }
+
+    .grand-total-box {
+      padding: 14px 16px;
+      border-right: 1px solid var(--slate);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .grand-total-value {
+      font-size: 32px;
+      line-height: 1.05;
+      margin-top: 4px;
+      font-weight: bold;
+      letter-spacing: -1px;
+    }
+
+    .vat-box {
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      font-size: 11px;
+    }
+
+    .vat-row {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dashed var(--slate);
+      padding-bottom: 2px;
+      margin-bottom: 2px;
+    }
+
+    .vat-toggle {
+      margin-top: 4px;
+      background: var(--black);
+      color: var(--white);
+      border: none;
+      padding: 4px 6px;
+      font-family: var(--font-main);
+      font-size: 9px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    /* STATUS STRIP */
+    .status-strip {
+      padding: 7px 12px;
+      background: var(--black);
+      border-bottom: 1px solid var(--slate);
+      font-size: 10px;
+      color: var(--white);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      min-height: 34px;
+    }
+
+    .status-text {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+    }
+
+    .mini-action-btn {
+      background: var(--black);
+      color: var(--white);
+      border: 1px solid var(--slate);
+      padding: 3px 6px;
+      font-family: var(--font-main);
+      font-size: 9px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .mini-action-btn:active {
+      background: var(--white);
+      color: var(--black);
+    }
+
+    /* MAIN VIEWPORT */
+    .view-container {
+      flex: 1;
+      overflow-y: auto;
+      background: var(--black);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* LEDGER LIST */
+    .ledger-header {
+      display: grid;
+      grid-template-columns: 30px 1fr 62px 78px 28px;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--slate);
+      font-size: 10px;
+      color: var(--slate);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      position: sticky;
+      top: 0;
+      background: var(--black);
+      z-index: 5;
+    }
+
+    .ledger-row {
+      display: grid;
+      grid-template-columns: 30px 1fr 62px 78px 28px;
+      align-items: center;
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--slate);
+    }
+
+    .row-idx {
+      font-size: 11px;
+      color: var(--slate);
+    }
+
+    .row-item-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding-right: 6px;
+      overflow: hidden;
+    }
+
+    .row-name {
+      font-size: 13px;
+      color: var(--white);
+      text-transform: uppercase;
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .prediction-badge {
+      font-size: 9px;
+      color: var(--slate);
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+    }
+
+    .alt-swap-btn {
+      margin-top: 2px;
+      align-self: flex-start;
+      background: transparent;
+      border: 1px solid var(--slate);
+      color: var(--white);
+      font-family: var(--font-main);
+      font-size: 8px;
+      padding: 2px 5px;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .qty-control {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+    }
+
+    .qty-btn {
+      width: 19px;
+      height: 19px;
+      background: var(--black);
+      color: var(--white);
+      border: 1px solid var(--slate);
+      font-family: var(--font-main);
+      cursor: pointer;
+      font-size: 11px;
+      line-height: 1;
+    }
+
+    .row-price {
+      text-align: right;
+      font-size: 13px;
+      color: var(--white);
+      padding-right: 6px;
+      cursor: pointer;
+    }
+
+    .del-btn {
+      background: transparent;
+      border: 1px solid var(--slate);
+      color: var(--slate);
+      width: 24px;
+      height: 24px;
+      font-family: var(--font-main);
+      cursor: pointer;
+      font-size: 11px;
+    }
+
+    .empty-state {
+      padding: 40px 20px;
+      text-align: center;
+      color: var(--slate);
+      font-size: 11px;
+      line-height: 1.8;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    /* MANUAL / VOICE SIMULATOR BAR */
+    .manual-bar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      border-top: 1px solid var(--slate);
+      border-bottom: 1px solid var(--slate);
+      background: var(--black);
+    }
+
+    .cmd-input {
+      background: var(--black);
+      border: none;
+      color: var(--white);
+      padding: 11px 12px;
+      font-family: var(--font-main);
+      font-size: 12px;
+      outline: none;
+    }
+
+    .cmd-input::placeholder {
+      color: var(--slate);
+    }
+
+    .cmd-submit {
+      background: var(--slate);
+      color: var(--white);
+      border: none;
+      padding: 0 14px;
+      font-family: var(--font-main);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+    }
+
+    /* BOTTOM TACTILE COMMAND DECK */
+    .command-deck {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      height: 100px;
+      background: var(--black);
+    }
+
+    .deck-trigger {
+      border: none;
+      background: var(--black);
+      color: var(--white);
+      font-family: var(--font-main);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 12px 16px;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .deck-trigger:first-child {
+      border-right: 1px solid var(--slate);
+    }
+
+    .deck-trigger.listening,
+    .deck-trigger:active {
+      background: var(--white);
+      color: var(--black);
+    }
+
+    .deck-trigger.listening .micro-label,
+    .deck-trigger:active .micro-label {
+      color: var(--black);
+    }
+
+    .trigger-main-label {
+      font-size: 17px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    /* SCANNER MODAL */
+    .scanner-modal {
+      position: absolute;
+      inset: 0;
+      background: var(--black);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .camera-viewport {
+      flex: 1;
+      position: relative;
+      background: var(--black);
+      border-bottom: 1px solid var(--slate);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    video#cameraFeed {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: grayscale(100%) contrast(140%);
+    }
+
+    .reticle {
+      position: absolute;
+      width: 78%;
+      height: 140px;
+      border: 2px solid var(--white);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 8px;
+      pointer-events: none;
+    }
+
+    .scanner-controls {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: var(--black);
+    }
+
+    .scan-input-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      border: 1px solid var(--slate);
+    }
+
+    .btn-block {
+      width: 100%;
+      padding: 14px;
+      background: var(--white);
+      color: var(--black);
+      border: none;
+      font-family: var(--font-main);
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    /* REPORTS VIEW */
+    .report-section {
+      padding: 16px;
+      border-bottom: 1px solid var(--slate);
+    }
+
+    .report-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .stat-card {
+      border: 1px solid var(--slate);
+      padding: 10px;
+    }
+
+    .stat-val {
+      font-size: 20px;
+      margin-top: 4px;
+      color: var(--white);
+    }
+
+    .receipt-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 11px;
+    }
+
+    .receipt-table td {
+      padding: 5px 0;
+      border-bottom: 1px dashed var(--slate);
+    }
+
+    .receipt-table td:last-child {
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-shell">
+  <!-- TOP HEADER -->
+  <header class="top-bar">
+    <div class="brand-block">
+      <span class="micro-label">BI-WEEKLY // 62-ITEM DB</span>
+      <h1 class="app-title">GROCERY LEDGER</h1>
+    </div>
+    <div class="mode-tabs">
+      <button class="tab-btn active" id="tabLedger" onclick="switchTab('ledger')">LIST</button>
+      <button class="tab-btn" id="tabReport" onclick="switchTab('report')">REPORT</button>
+    </div>
+  </header>
+
+  <!-- LIVE FINANCIAL & 12% VAT SUMMARY -->
+  <section class="summary-ticker">
+    <div class="grand-total-box">
+      <span class="micro-label">GRAND TOTAL (PHP)</span>
+      <div class="grand-total-value" id="grandTotalDisplay">₱0.00</div>
+    </div>
+    <div class="vat-box">
+      <div>
+        <div class="vat-row">
+          <span>VATABLE (V):</span>
+          <strong id="netSalesDisplay">₱0.00</strong>
+        </div>
+        <div class="vat-row">
+          <span>EXEMPT (E):</span>
+          <strong id="exemptSalesDisplay">₱0.00</strong>
+        </div>
+        <div class="vat-row">
+          <span>12% VAT:</span>
+          <strong id="vatAmountDisplay">₱0.00</strong>
+        </div>
+      </div>
+      <button class="vat-toggle" id="vatModeBtn" onclick="toggleVatMode()">
+        MODE: VAT-INCLUSIVE (PH RECEIPT)
+      </button>
+    </div>
+  </section>
+
+  <!-- STATUS & QUICK RECEIPT LOADER -->
+  <div class="status-strip">
+    <span class="status-text" id="statusText">SAY "ADD 50", "ADD 82", OR "DELETE 1"</span>
+    <button class="mini-action-btn" onclick="loadFullReceiptCart()">LOAD RECEIPT (62)</button>
+    <button class="mini-action-btn" onclick="clearCart()">CLR</button>
+  </div>
+
+  <!-- VIEW 1: ACTIVE GROCERY LEDGER -->
+  <main class="view-container" id="ledgerView">
+    <div class="ledger-header">
+      <span>#</span>
+      <span>ITEM / PRICE PREDICTION</span>
+      <span>QTY</span>
+      <span style="text-align:right; padding-right:6px;">TOTAL</span>
+      <span></span>
+    </div>
+    <div id="ledgerList"></div>
+  </main>
+
+  <!-- VIEW 2: BI-WEEKLY TRIP REPORT -->
+  <main class="view-container hidden" id="reportView">
+    <div class="report-section">
+      <span class="micro-label">BI-WEEKLY TRIP DIAGNOSTICS</span>
+      <div class="report-grid">
+        <div class="stat-card">
+          <span class="micro-label">UNIQUE SKUS / UNITS</span>
+          <div class="stat-val" id="repTotalUnits">0 / 0</div>
+        </div>
+        <div class="stat-card">
+          <span class="micro-label">AVG UNIT COST</span>
+          <div class="stat-val" id="repAvgCost">₱0.00</div>
+        </div>
+        <div class="stat-card">
+          <span class="micro-label">RECEIPT BASELINE</span>
+          <div class="stat-val">₱3,670.50</div>
+        </div>
+        <div class="stat-card">
+          <span class="micro-label">VARIANCE VS LAST</span>
+          <div class="stat-val" id="repVariance">₱0.00</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="report-section">
+      <span class="micro-label">12% VAT & EXEMPT RECEIPT AUDIT</span>
+      <table class="receipt-table">
+        <tr>
+          <td>RAW BASKET SUBTOTAL</td>
+          <td id="repRawSubtotal">₱0.00</td>
+        </tr>
+        <tr>
+          <td>VATABLE SALES (NET OF 12% VAT)</td>
+          <td id="repVatable">₱0.00</td>
+        </tr>
+        <tr>
+          <td>VAT-EXEMPT SALES ('E' ITEMS)</td>
+          <td id="repExempt">₱0.00</td>
+        </tr>
+        <tr>
+          <td>12% VALUE ADDED TAX</td>
+          <td id="repVat">₱0.00</td>
+        </tr>
+        <tr style="font-weight:bold; font-size:14px;">
+          <td>TOTAL AMOUNT PAYABLE</td>
+          <td id="repFinal">₱0.00</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="report-section">
+      <span class="micro-label">YOUR 62-ITEM RECEIPT DATABASE (SORTED BY PRICE)</span>
+      <div id="priceMemoryList" style="margin-top: 10px; font-size: 10px; color: var(--slate); line-height: 1.75; max-height: 220px; overflow-y: auto;"></div>
+      <button class="btn-block" style="margin-top: 14px;" onclick="exportTripReport()">
+        EXPORT / COPY RECEIPT REPORT
+      </button>
+    </div>
+  </main>
+
+  <!-- QUICK VOICE/PRICE SIMULATOR BAR -->
+  <div class="manual-bar">
+    <input
+      type="text"
+      id="commandInput"
+      class="cmd-input"
+      placeholder="Type price ('69.50', '4 50') or command ('delete 1')..."
+      onkeydown="if(event.key==='Enter') handleManualCommand()"
+    />
+    <button class="cmd-submit" onclick="handleManualCommand()">EXEC</button>
+  </div>
+
+  <!-- BOTTOM TACTILE COMMAND DECK -->
+  <footer class="command-deck">
+    <button class="deck-trigger" id="voiceTrigger" onclick="toggleVoiceRecognition()">
+      <span class="micro-label" id="voiceSubLabel">HANDS-FREE AUDIO</span>
+      <span class="trigger-main-label" id="voiceMainLabel">[ VOICE CMD ]</span>
+    </button>
+    <button class="deck-trigger" onclick="openScanner()">
+      <span class="micro-label">OPTICAL TAG / BARCODE</span>
+      <span class="trigger-main-label">[ SCAN ITEM ]</span>
+    </button>
+  </footer>
+
+  <!-- OPTICAL SCANNER OVERLAY -->
+  <div class="scanner-modal hidden" id="scannerModal">
+    <div class="top-bar">
+      <div class="brand-block">
+        <span class="micro-label">OPTICAL RECOGNITION</span>
+        <h2 class="app-title">PRICE & BARCODE OCR</h2>
+      </div>
+      <button class="tab-btn active" onclick="closeScanner()">CLOSE [X]</button>
+    </div>
+
+    <div class="camera-viewport">
+      <video id="cameraFeed" autoplay playsinline muted></video>
+      <div class="reticle">
+        <span class="micro-label" style="background:var(--black); width:max-content; padding:2px 4px;">
+          ALIGN PRICE TAG OR BARCODE
+        </span>
+        <span class="micro-label" id="liveScanPreview" style="background:var(--black); padding:2px 4px;">
+          AWAITING CAPTURE...
+        </span>
+      </div>
+    </div>
+
+    <div class="scanner-controls">
+      <span class="micro-label">DETECTED PRICE OR BARCODE (AUTO-PREDICTS RECEIPT ITEM)</span>
+      <div class="scan-input-row">
+        <input
+          type="text"
+          id="scannedPriceInput"
+          class="cmd-input"
+          placeholder="Enter price (e.g. 69.50) or barcode..."
+          oninput="previewScannedPrediction(this.value)"
+        />
+        <button class="cmd-submit" onclick="simulateOpticalTagRead()">SAMPLE TAG</button>
+      </div>
+      <button class="btn-block" onclick="confirmScannedItem()">
+        ADD DETECTED ITEM TO LEDGER
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  /********************************************************************
+   * 1. YOUR ACTUAL 62-ITEM GROCERY RECEIPT DATABASE
+   * Extracted directly from your 2 supermarket receipt images.
+   * tax: 'V' = 12% VATable, 'E' = VAT-Exempt
+   ********************************************************************/
+  const priceMemoryDB = [
+    // --- RECEIPT IMAGE 1 (45 ITEMS) ---
+    { barcode: "0054928367911", price: 50.00, defaultQty: 4, tax: "V", name: "YKULT MILK 80X5 (YAKULT 5S)" },
+    { barcode: "4800249005943", price: 69.50, defaultQty: 1, tax: "V", name: "ULAM BRGR CRSP220G (ULAM BURGER)" },
+    { barcode: "0000008301239", price: 50.00, defaultQty: 1, tax: "E", name: "LKC ENOKI MSHRM200 (ENOKI MUSHROOM)" },
+    { barcode: "4800087300204", price: 190.00, defaultQty: 1, tax: "V", name: "PF TJ HDG JB 4.5 (PUREFOODS TJ HOTDOG)" },
+    { barcode: "4809010316592", price: 33.50, defaultQty: 1, tax: "E", name: "PG BOL MX VEG200G (MIXED VEGGIES)" },
+    { barcode: "6974100710074", price: 40.00, defaultQty: 1, tax: "V", name: "WHYNOTSBRYWHTDECC (STRAWBERRY CHOC)" },
+    { barcode: "4801981112005", price: 82.00, defaultQty: 1, tax: "V", name: "COKE 2L" },
+    { barcode: "6974100710050", price: 35.00, defaultQty: 2, tax: "V", name: "WHYNOTMTEAWHTDECC (MILK TEA CHOC)" },
+    { barcode: "4800194178143", price: 24.90, defaultQty: 1, tax: "V", name: "OISHI P N-C T-C95G (OISHI 95G)" },
+    { barcode: "4800194115278", price: 29.40, defaultQty: 1, tax: "V", name: "OISHI P-CSLTDEGG80 (SALTED EGG 80G)" },
+    { barcode: "4800016671500", price: 33.00, defaultQty: 1, tax: "V", name: "JNJ PTS S-CRM85G (PIATTOS SOUR CREAM)" },
+    { barcode: "4800016666421", price: 35.00, defaultQty: 1, tax: "V", name: "JNJ PIATTOS S-C85G (PIATTOS CHEESE)" },
+    { barcode: "4800016130540", price: 26.85, defaultQty: 1, tax: "V", name: "GG TRTILLOS CH100G (TORTILLOS CHEESE)" },
+    { barcode: "4806010406072", price: 86.75, defaultQty: 1, tax: "V", name: "LS LAVA Q C-UBE30G (LAVA CAKE UBE)" },
+    { barcode: "4800040342636", price: 65.50, defaultQty: 1, tax: "V", name: "FBSCO HI-RO 10S (FIBISCO HI-RO)" },
+    { barcode: "8801073113893", price: 84.75, defaultQty: 1, tax: "V", name: "SMYANG H-C CAR130G (SAMYANG CARBONARA)" },
+    { barcode: "4807770270024", price: 9.00,  defaultQty: 7,tax: "V", name: "LM CHX NDLS 55 (LUCKY ME CHICKEN)" },
+    { barcode: "4807770273704", price: 14.75, defaultQty: 1, tax: "V", name: "LM!PC ORIGINAL 80G (PANCIT CANTON)" },
+    { barcode: "4807770272813", price: 15.75, defaultQty: 2, tax: "V", name: "LMLAPAZBTCHY55G (LA PAZ BATCHOY)" },
+    { barcode: "8996001526200", price: 15.60, defaultQty: 2, tax: "V", name: "WOW PSTA CRBNRA80G (WOW CARBONARA)" },
+    { barcode: "7622300561529", price: 29.50, defaultQty: 1, tax: "V", name: "CHZWHIZ 60G6SY SQZ (CHEEZ WHIZ 60G)" },
+    { barcode: "4800124906747", price: 25.75, defaultQty: 1, tax: "V", name: "EXCELLENT M-S 100G (MACARONI 100G)" },
+    { barcode: "4800274040018", price: 78.00, defaultQty: 1, tax: "V", name: "QUKER-I OATSFL400G (QUAKER OATS 400G)" },
+    { barcode: "4800344001949", price: 11.00, defaultQty: 1, tax: "V", name: "SS SOYSCE 200ML (SILVER SWAN SOY)" },
+    { barcode: "4800361431587", price: 21.50, defaultQty: 2, tax: "V", name: "NSTEA LMN CCMBR19G (NESTEA LEMON)" },
+    { barcode: "4800361392549", price: 22.50, defaultQty: 1, tax: "V", name: "NSTCRNBRY LP20G19G (NESTEA CRANBERRY)" },
+    { barcode: "4800018022258", price: 123.25, defaultQty: 1, tax: "V", name: "GT CHCO TWN50GX10S (GREAT TASTE CHOCO)" },
+    { barcode: "4806030204373", price: 24.00, defaultQty: 1, tax: "V", name: "GLIFE PREM F-CO0G (GOOD LIFE COATING)" },
+    { barcode: "4800361426927", price: 195.70, defaultQty: 1, tax: "V", name: "BR BRND PMD300GX2S (BEAR BRAND 300GX2)" },
+    { barcode: "4800018022265", price: 123.25, defaultQty: 1, tax: "V", name: "GT WHT TWN 50GX10S (GREAT TASTE WHITE)" },
+    { barcode: "4801958393109", price: 19.75, defaultQty: 2, tax: "V", name: "AJ CRISPY GRLC65G (CRISPY FRY GARLIC)" },
+    { barcode: "4806014092035", price: 19.50, defaultQty: 1, tax: "V", name: "GOODLIFEBRDCRMB500 (BREADCRUMBS)" },
+    { barcode: "0025407803306", price: 86.50, defaultQty: 1, tax: "V", name: "MS PEANUT SCE 100G (MAMA SITA PEANUT)" },
+    { barcode: "4809015402306", price: 25.00, defaultQty: 1, tax: "V", name: "PURE B-B P-WHLE30G (WHOLE BLACK PEPPER)" },
+    { barcode: "4800344009989", price: 10.75, defaultQty: 2, tax: "V", name: "SS SPCPTIS100ML (SILVER SWAN PATIS)" },
+    { barcode: "0748485100401", price: 37.50, defaultQty: 2, tax: "V", name: "CTFLKV-O 155G (CENTURY TUNA 155G)" },
+    { barcode: "4801668604005", price: 125.00, defaultQty: 1, tax: "V", name: "HAPI FSTA VEG900ML (HAPI FIESTA OIL)" },
+    { barcode: "4800888601025", price: 36.75, defaultQty: 1, tax: "V", name: "KNORR CHICKEN CUBE" },
+    { barcode: "4801958146002", price: 14.00, defaultQty: 1, tax: "V", name: "AJI 50G (AJINOMOTO 50G)" },
+    { barcode: "0096705013113", price: 79.75, defaultQty: 1, tax: "V", name: "SBA MACK NO 425G (SABA MACKEREL)" },
+    { barcode: "4800024577139", price: 33.75, defaultQty: 1, tax: "V", name: "DM SWT B-K320W-SPT (DEL MONTE KETCHUP)" },
+    { barcode: "4806512020937", price: 117.00, defaultQty: 1, tax: "V", name: "M-STAS L-SDIUM405G (MAMA SITA OYSTER)" },
+    { barcode: "4800249003567", price: 85.50, defaultQty: 1, tax: "V", name: "CDOCHN LMEAT350 (CDO LUNCHEON MEAT)" },
+    { barcode: "4800007011670", price: 39.50, defaultQty: 1, tax: "V", name: "STAR C-BEEF175G (STAR CORNED BEEF)" },
+    { barcode: "0731126011006", price: 17.00, defaultQty: 1, tax: "V", name: "CRM C-STARCH 75G (CREAM CORNSTARCH)" },
+
+    // --- RECEIPT IMAGE 2 (17 ITEMS) ---
+    { barcode: "4806502727423", price: 90.00, defaultQty: 1, tax: "V", name: "NEUBAKE WHTBRD560G (NEUBAKE BREAD)" },
+    { barcode: "4800488180119", price: 23.50, defaultQty: 2, tax: "V", name: "CHRMEE WING 8S (CHARMEE WINGS 8S)" },
+    { barcode: "0000008451095", price: 36.00, defaultQty: 1, tax: "V", name: "REACH CL W20SGRN-T (REACH WIPES 20S)" },
+    { barcode: "4801288800089", price: 13.25, defaultQty: 4, tax: "V", name: "THSE DYS SN THN50S (THOSE DAYS NAPKIN)" },
+    { barcode: "4806520414756", price: 36.00, defaultQty: 1, tax: "V", name: "KJSN SK-L FWSH 15G (KOJIE SAN WASH)" },
+    { barcode: "4800047847349", price: 68.75, defaultQty: 1, tax: "V", name: "DE FS LVBRZE33ML12 (DEL FABCON 12S)" },
+    { barcode: "4806501703497", price: 12.00, defaultQty: 1, tax: "V", name: "CALLA BAR F-FRESH (CALLA DETERGENT)" },
+    { barcode: "4987176126252", price: 129.00, defaultQty: 1, tax: "V", name: "ARIEL PW SRF3PD90G (ARIEL POWDER)" },
+    { barcode: "6920354826559", price: 133.00, defaultQty: 1, tax: "V", name: "COLG T CFC120G2SVP (COLGATE 120GX2)" },
+    { barcode: "4806507832214", price: 23.00, defaultQty: 1, tax: "V", name: "SILKA SP GPPYA65G (SILKA GREEN PAPAYA)" },
+    { barcode: "4902430327428", price: 20.75, defaultQty: 1, tax: "V", name: "SG BAR AAC-FRSH65G (SAFEGUARD 65G)" },
+    { barcode: "4800047863158", price: 16.00, defaultQty: 1, tax: "V", name: "GC SOAP C-MTN 55G (GREEN CROSS SOAP)" },
+    { barcode: "4800047840272", price: 30.25, defaultQty: 1, tax: "V", name: "ZONROX LEMON 500ML" },
+    { barcode: "4806502161111", price: 48.00, defaultQty: 1, tax: "V", name: "REACH BT 2PLY 4S (BATHROOM TISSUE 4S)" },
+    { barcode: "4806519092091", price: 95.00, defaultQty: 1, tax: "V", name: "UNI ALCO SAFE E-AL (ETHYL ALCOHOL)" },
+    { barcode: "4800888240064", price: 46.50, defaultQty: 1, tax: "V", name: "CSILK D-RPAIR10M6S (CREAM SILK 6S)" },
+    { barcode: "4800888169693", price: 77.00, defaultQty: 2, tax: "V", name: "SSILK SH ORNG13M12 (SUNSILK 12S)" }
+  ];
+
+  // Start with the first 5 items from your receipt (or tap "LOAD RECEIPT (62)" for all 62)
+  let cart = [];
+  let vatInclusive = true;
+
+  function loadFullReceiptCart() {
+    cart = priceMemoryDB.map((item, idx) => ({
+      id: Date.now() + idx,
+      name: item.name,
+      price: item.price,
+      qty: item.defaultQty,
+      tax: item.tax,
+      alternates: getAlternatesForPrice(item.price, item.name),
+      source: `RECEIPT DB [${item.tax}]`
+    }));
+    setStatus("LOADED ALL 62 ITEMS FROM YOUR RECEIPT (₱3,670.50)");
+    renderLedger();
+  }
+
+  function clearCart() {
+    cart = [];
+    setStatus("CART CLEARED // SAY 'ADD 50' OR 'ADD 82'");
+    renderLedger();
+  }
+
+  function getAlternatesForPrice(price, currentName) {
+    return priceMemoryDB
+      .filter(i => Math.abs(i.price - price) < 0.01 && i.name !== currentName)
+      .map(i => ({ name: i.name, tax: i.tax }));
+  }
+
+  /********************************************************************
+   * 2. PRICE & BARCODE PREDICTION ENGINE
+   ********************************************************************/
+  function predictItemFromPriceOrBarcode(inputVal) {
+    const cleanStr = String(inputVal).trim();
+
+    // 1. Check Barcode Match first (if user scanned/typed 7+ digits)
+    if (/^\d{7,14}$/.test(cleanStr)) {
+      const byBarcode = priceMemoryDB.find(i => i.barcode.includes(cleanStr));
+      if (byBarcode) {
+        return {
+          name: byBarcode.name,
+          price: byBarcode.price,
+          tax: byBarcode.tax,
+          alternates: [],
+          method: `BARCODE MATCH`
+        };
+      }
+    }
+
+    const numPrice = parseFloat(cleanStr);
+    if (isNaN(numPrice) || numPrice <= 0) {
+      return { name: "UNCLASSIFIED ITEM", price: 0, tax: "V", alternates: [], method: "MANUAL" };
+    }
+
+    // 2. Exact Unit Price Match
+    const exactMatches = priceMemoryDB.filter(i => Math.abs(i.price - numPrice) < 0.01);
+    if (exactMatches.length > 0) {
+      const primary = exactMatches[0];
+      return {
+        name: primary.name,
+        price: numPrice,
+        tax: primary.tax,
+        alternates: exactMatches.slice(1).map(a => ({ name: a.name, tax: a.tax })),
+        method: exactMatches.length > 1
+          ? `EXACT ₱${numPrice.toFixed(2)} (${exactMatches.length} MATCHES)`
+          : `EXACT PRICE MATCH`
+      };
+    }
+
+    // 3. Check if user spoke the line total (e.g. "200" for 4x50 Yakult or "63" for 7x9 Lucky Me)
+    const lineTotalMatch = priceMemoryDB.find(
+      i => i.defaultQty > 1 && Math.abs(i.price * i.defaultQty - numPrice) < 0.01
+    );
+    if (lineTotalMatch) {
+      return {
+        name: lineTotalMatch.name,
+        price: lineTotalMatch.price,
+        suggestedQty: lineTotalMatch.defaultQty,
+        tax: lineTotalMatch.tax,
+        alternates: [],
+        method: `BUNDLE MATCH (${lineTotalMatch.defaultQty}x @ ₱${lineTotalMatch.price.toFixed(2)})`
+      };
+    }
+
+    // 4. Nearest Price Neighbor within ±₱3.00 (Inflation Tolerance)
+    let closest = null;
+    let minDiff = Infinity;
+    for (const item of priceMemoryDB) {
+      const diff = Math.abs(item.price - numPrice);
+      if (diff <= 3.00 && diff < minDiff) {
+        minDiff = diff;
+        closest = item;
+      }
+    }
+
+    if (closest) {
+      return {
+        name: closest.name,
+        price: numPrice,
+        tax: closest.tax,
+        alternates: [],
+        method: `NEAR ₱${closest.price.toFixed(2)} (±₱${minDiff.toFixed(2)})`
+      };
+    }
+
+    return {
+      name: `NEW GROCERY ITEM @ ₱${numPrice.toFixed(2)}`,
+      price: numPrice,
+      tax: "V",
+      alternates: [],
+      method: "UNLISTED PRICE"
+    };
+  }
+
+  function swapAlternateItem(cartIndex) {
+    const item = cart[cartIndex];
+    if (!item.alternates || item.alternates.length === 0) return;
+    const nextAlt = item.alternates.shift();
+    item.alternates.push({ name: item.name, tax: item.tax });
+    item.name = nextAlt.name;
+    item.tax = nextAlt.tax;
+    setStatus(`SWAPPED TO: ${item.name} [${item.tax}]`);
+    renderLedger();
+  }
+
+  /********************************************************************
+   * 3. VOICE & TEXT COMMAND PARSER (ADD, EDIT, DELETE)
+   ********************************************************************/
+  function processCommand(rawTranscript) {
+    const text = rawTranscript.toLowerCase().trim();
+    if (!text) return;
+
+    // A. DELETE COMMANDS ("delete 1", "remove last", "delete coke")
+    if (text.startsWith("delete") || text.startsWith("remove")) {
+      if (text.includes("last") && cart.length > 0) {
+        const removed = cart.pop();
+        setStatus(`DELETED LAST: ${removed.name}`);
+        renderLedger();
+        return;
+      }
+      const idxMatch = text.match(/(?:item|number|#)?\s*(\d+)/);
+      if (idxMatch) {
+        const idx = parseInt(idxMatch[1], 10) - 1;
+        if (cart[idx]) {
+          const removed = cart.splice(idx, 1)[0];
+          setStatus(`DELETED #${idx + 1}: ${removed.name}`);
+          renderLedger();
+          return;
+        }
+      }
+      const kw = text.replace(/delete|remove|item/g, "").trim().toUpperCase();
+      const foundIdx = cart.findIndex(i => i.name.includes(kw));
+      if (foundIdx !== -1) {
+        const removed = cart.splice(foundIdx, 1)[0];
+        setStatus(`DELETED: ${removed.name}`);
+        renderLedger();
+        return;
+      }
+      setStatus("DELETE FAILED // ITEM NOT FOUND");
+      return;
+    }
+
+    // B. EDIT COMMANDS ("edit item 1 to 90", "quantity item 1 to 4")
+    if (text.startsWith("edit") || text.startsWith("change") || text.startsWith("update") || text.startsWith("quantity")) {
+      const nums = text.match(/\d+(\.\d+)?/g);
+      if (text.includes("quantity") && nums && nums.length >= 2) {
+        const idx = parseInt(nums[0], 10) - 1;
+        const newQty = parseInt(nums[1], 10);
+        if (cart[idx] && newQty > 0) {
+          cart[idx].qty = newQty;
+          setStatus(`UPDATED #${idx + 1} QTY TO ${newQty}`);
+          renderLedger();
+          return;
+        }
+      }
+      if (nums && nums.length >= 2) {
+        const idx = parseInt(nums[0], 10) - 1;
+        const newPrice = parseFloat(nums[1]);
+        if (cart[idx]) {
+          const pred = predictItemFromPriceOrBarcode(newPrice);
+          cart[idx].price = newPrice;
+          cart[idx].name = pred.name;
+          cart[idx].tax = pred.tax;
+          cart[idx].alternates = pred.alternates;
+          cart[idx].source = pred.method;
+          setStatus(`UPDATED #${idx + 1} -> ${pred.name}`);
+          renderLedger();
+          return;
+        }
+      }
+      setStatus("EDIT FORMAT: 'EDIT ITEM 1 TO 69.50'");
+      return;
+    }
+
+    // C. ADD BY VOICE OR PRICE ("add 69.50", "add 4 50", "82")
+    const normalized = text
+      .replace(/\bone\b/g, "1")
+      .replace(/\btwo\b/g, "2")
+      .replace(/\bthree\b/g, "3")
+      .replace(/\bfour\b/g, "4")
+      .replace(/\bseven\b/g, "7");
+
+    const nums = normalized.match(/\d+(\.\d+)?/g);
+    if (!nums) {
+      // Search by spoken product keyword if no price was said (e.g., "add yakult" or "add coke")
+      const spokenKw = normalized.replace(/add|buy|grab/g, "").trim().toUpperCase();
+      const kwMatch = priceMemoryDB.find(i => i.name.includes(spokenKw));
+      if (kwMatch) {
+        cart.unshift({
+          id: Date.now(),
+          name: kwMatch.name,
+          price: kwMatch.price,
+          qty: kwMatch.defaultQty,
+          tax: kwMatch.tax,
+          alternates: getAlternatesForPrice(kwMatch.price, kwMatch.name),
+          source: "VOICE KEYWORD MATCH"
+        });
+        setStatus(`ADDED: ${kwMatch.defaultQty}x ${kwMatch.name}`);
+        renderLedger();
+        return;
+      }
+      setStatus("SAY A PRICE ('ADD 69.50') OR ITEM ('ADD COKE')");
+      return;
+    }
+    
+    let qty = 1;
+    let rawTarget = nums[nums.length - 1];
+    if (nums.length >= 2) {
+      qty = parseInt(nums[0], 10) || 1;
+    }
+
+    const pred = predictItemFromPriceOrBarcode(rawTarget);
+    if (pred.suggestedQty && nums.length === 1) {
+      qty = pred.suggestedQty;
+    }
+
+    cart.unshift({
+      id: Date.now(),
+      name: pred.name,
+      price: pred.price,
+      qty: qty,
+      tax: pred.tax,
+      alternates: pred.alternates || [],
+      source: `${pred.method} [${pred.tax}]`
+    });
+
+    setStatus(`ADDED: ${qty}x ${pred.name} @ ₱${pred.price.toFixed(2)}`);
+    renderLedger();
+  }
+
+  function handleManualCommand() {
+    const input = document.getElementById("commandInput");
+    if (!input.value.trim()) return;
+    processCommand(input.value);
+    input.value = "";
+  }
+
+  /********************************************************************
+   * 4. HANDS-FREE VOICE RECOGNITION
+   ********************************************************************/
+  let recognition = null;
+  let isListening = false;
+
+  function toggleVoiceRecognition() {
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const btn = document.getElementById("voiceTrigger");
+    const mainLbl = document.getElementById("voiceMainLabel");
+    const subLbl = document.getElementById("voiceSubLabel");
+
+    if (!SpeechRec) {
+      const fallback = prompt("Enter voice command (e.g., 'Add 69.50', 'Add 4 50', 'Delete 1'):");
+      if (fallback) processCommand(fallback);
+      return;
+    }
+
+    if (isListening && recognition) {
+      recognition.stop();
+      return;
+    }
+
+    recognition = new SpeechRec();
+    recognition.lang = "en-PH";
+    recognition.interimResults = false;
+
+    recognition.onstart = () => {
+      isListening = true;
+      btn.classList.add("listening");
+      subLbl.textContent = "LISTENING // SPEAK NOW";
+      mainLbl.textContent = "[ STOP MIC ]";
+    };
+
+    recognition.onresult = (event) => {
+      processCommand(event.results[0][0].transcript);
+    };
+
+    recognition.onend = () => {
+      isListening = false;
+      btn.classList.remove("listening");
+      subLbl.textContent = "HANDS-FREE AUDIO";
+      mainLbl.textContent = "[ VOICE CMD ]";
+    };
+
+    recognition.start();
+  }
+
+  /********************************************************************
+   * 5. OPTICAL SCANNER
+   ********************************************************************/
+  let cameraStream = null;
+
+  async function openScanner() {
+    document.getElementById("scannerModal").classList.remove("hidden");
+    const video = document.getElementById("cameraFeed");
+    try {
+      cameraStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment" }
+      });
+      video.srcObject = cameraStream;
+    } catch (err) {
+      document.getElementById("liveScanPreview").textContent = "USE TAG INPUT OR SAMPLE BUTTON BELOW";
+    }
+  }
+
+  function closeScanner() {
+    document.getElementById("scannerModal").classList.add("hidden");
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(t => t.stop());
+      cameraStream = null;
+    }
+  }
+
+  function previewScannedPrediction(val) {
+    const preview = document.getElementById("liveScanPreview");
+    if (!val) {
+      preview.textContent = "AWAITING CAPTURE...";
+      return;
+    }
+    const pred = predictItemFromPriceOrBarcode(val);
+    preview.textContent = `₱${pred.price.toFixed(2)} -> ${pred.name}`;
+  }
+
+  function simulateOpticalTagRead() {
+    const sample = priceMemoryDB[Math.floor(Math.random() * priceMemoryDB.length)];
+    const input = document.getElementById("scannedPriceInput");
+    input.value = sample.price.toFixed(2);
+    previewScannedPrediction(sample.price);
+  }
+
+  function confirmScannedItem() {
+    const input = document.getElementById("scannedPriceInput");
+    if (!input.value.trim()) {
+      simulateOpticalTagRead();
+      return;
+    }
+    processCommand(input.value);
+    input.value = "";
+    closeScanner();
+  }
+
+  /********************************************************************
+   * 6. LEDGER RENDERING & EXACT V / E 12% VAT ENGINE
+   ********************************************************************/
+  function toggleVatMode() {
+    vatInclusive = !vatInclusive;
+    document.getElementById("vatModeBtn").textContent = vatInclusive
+      ? "MODE: VAT-INCLUSIVE (PH RECEIPT)"
+      : "MODE: +12% EXCLUSIVE";
+    renderLedger();
+  }
+
+  function adjustQty(index, delta) {
+    cart[index].qty += delta;
+    if (cart[index].qty <= 0) cart.splice(index, 1);
+    renderLedger();
+  }
+
+  function deleteItem(index) {
+    cart.splice(index, 1);
+    renderLedger();
+  }
+
+  function editItemInline(index) {
+    const current = cart[index];
+    const newPriceStr = prompt(`Edit unit price for ${current.name}:`, current.price);
+    if (newPriceStr === null) return;
+    const newPrice = parseFloat(newPriceStr);
+    if (!isNaN(newPrice) && newPrice > 0) {
+      const pred = predictItemFromPriceOrBarcode(newPrice);
+      current.price = newPrice;
+      const customName = prompt(`Confirm item name for ₱${newPrice.toFixed(2)}:`, pred.name);
+      if (customName) current.name = customName.toUpperCase();
+      renderLedger();
+    }
+  }
+
+  function renderLedger() {
+    const container = document.getElementById("ledgerList");
+    container.innerHTML = "";
+
+    if (cart.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          CART EMPTY.<br/>
+          TAP [LOAD RECEIPT (62)] ABOVE TO LOAD YOUR FULL LIST<br/>
+          OR SAY "ADD 50", "ADD 69.50", "ADD 190".
+        </div>
+      `;
+    } else {
+      cart.forEach((item, idx) => {
+        const lineTotal = item.price * item.qty;
+        const hasAlt = item.alternates && item.alternates.length > 0;
+        const row = document.createElement("div");
+        row.className = "ledger-row";
+        row.innerHTML = `
+          <span class="row-idx">${String(idx + 1).padStart(2, "0")}</span>
+          <div class="row-item-info">
+            <span class="row-name" onclick="editItemInline(${idx})">${item.name}</span>
+            <span class="prediction-badge">₱${item.price.toFixed(2)} // ${item.source}</span>
+            ${hasAlt ? `<button class="alt-swap-btn" onclick="swapAlternateItem(${idx})">SWAP ALT: ${item.alternates[0].name}</button>` : ""}
+          </div>
+          <div class="qty-control">
+            <button class="qty-btn" onclick="adjustQty(${idx}, -1)">-</button>
+            <span>${item.qty}</span>
+            <button class="qty-btn" onclick="adjustQty(${idx}, 1)">+</button>
+          </div>
+          <div class="row-price" onclick="editItemInline(${idx})">₱${lineTotal.toFixed(2)} ${item.tax}</div>
+          <button class="del-btn" onclick="deleteItem(${idx})">X</button>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    // Separate 'V' (12% VATable) and 'E' (VAT-Exempt) totals just like your supermarket receipt
+    const rawVatableTotal = cart
+      .filter(i => i.tax !== "E")
+      .reduce((sum, i) => sum + i.price * i.qty, 0);
+
+    const rawExemptTotal = cart
+      .filter(i => i.tax === "E")
+      .reduce((sum, i) => sum + i.price * i.qty, 0);
+
+    let netVatableSales = 0;
+    let vatAmount = 0;
+    let grandTotal = 0;
+
+    if (vatInclusive) {
+      netVatableSales = rawVatableTotal / 1.12;
+      vatAmount = rawVatableTotal - netVatableSales;
+      grandTotal = rawVatableTotal + rawExemptTotal;
+    } else {
+      netVatableSales = rawVatableTotal;
+      vatAmount = netVatableSales * 0.12;
+      grandTotal = netVatableSales + vatAmount + rawExemptTotal;
+    }
+
+    document.getElementById("grandTotalDisplay").textContent = `₱${grandTotal.toFixed(2)}`;
+    document.getElementById("netSalesDisplay").textContent = `₱${netVatableSales.toFixed(2)}`;
+    document.getElementById("exemptSalesDisplay").textContent = `₱${rawExemptTotal.toFixed(2)}`;
+    document.getElementById("vatAmountDisplay").textContent = `₱${vatAmount.toFixed(2)}`;
+
+    const totalUnits = cart.reduce((sum, i) => sum + i.qty, 0);
+    document.getElementById("repTotalUnits").textContent = `${cart.length} / ${totalUnits}`;
+    document.getElementById("repAvgCost").textContent = totalUnits > 0 ? `₱${(grandTotal / totalUnits).toFixed(2)}` : "₱0.00";
+
+    const diff = grandTotal - 3670.50;
+    document.getElementById("repVariance").textContent = `${diff >= 0 ? "+" : "-"}₱${Math.abs(diff).toFixed(2)}`;
+    document.getElementById("repRawSubtotal").textContent = `₱${(rawVatableTotal + rawExemptTotal).toFixed(2)}`;
+    document.getElementById("repVatable").textContent = `₱${netVatableSales.toFixed(2)}`;
+    document.getElementById("repExempt").textContent = `₱${rawExemptTotal.toFixed(2)}`;
+    document.getElementById("repVat").textContent = `₱${vatAmount.toFixed(2)}`;
+    document.getElementById("repFinal").textContent = `₱${grandTotal.toFixed(2)}`;
+
+    const memContainer = document.getElementById("priceMemoryList");
+    memContainer.innerHTML = priceMemoryDB
+      .slice()
+      .sort((a, b) => a.price - b.price)
+      .map(m => `[₱${m.price.toFixed(2)} ${m.tax}] ${m.name} (x${m.defaultQty})`)
+      .join("<br/>");
+  }
+
+  function switchTab(tab) {
+    const isLedger = tab === "ledger";
+    document.getElementById("ledgerView").classList.toggle("hidden", !isLedger);
+    document.getElementById("reportView").classList.toggle("hidden", isLedger);
+    document.getElementById("tabLedger").classList.toggle("active", isLedger);
+    document.getElementById("tabReport").classList.toggle("active", !isLedger);
+  }
+
+  function setStatus(msg) {
+    document.getElementById("statusText").textContent = msg;
+  }
+
+  function exportTripReport() {
+    const lines = cart.map(
+      (i, idx) => `${idx + 1}. ${i.name} | ${i.qty} x ₱${i.price.toFixed(2)} = ₱${(i.qty * i.price).toFixed(2)} ${i.tax}`
+    );
+    const report = [
+      "=== BI-WEEKLY GROCERY RECEIPT ===",
+      `DATE: ${new Date().toLocaleDateString()}`,
+      "---------------------------------",
+      ...lines,
+      "---------------------------------",
+      `VATABLE SALES: ${document.getElementById("repVatable").textContent}`,
+      `VAT-EXEMPT:    ${document.getElementById("repExempt").textContent}`,
+      `12% VAT:       ${document.getElementById("repVat").textContent}`,
+      `GRAND TOTAL:   ${document.getElementById("repFinal").textContent}`
+    ].join("\n");
+
+    navigator.clipboard?.writeText(report);
+    alert("RECEIPT COPIED TO CLIPBOARD!");
+  }
+
+  // Pre-load the first 6 items on startup (tap 'LOAD RECEIPT (62)' for all 62)
+  cart = priceMemoryDB.slice(0, 6).map((item, idx) => ({
+    id: idx + 1,
+    name: item.name,
+    price: item.price,
+    qty: item.defaultQty,
+    tax: item.tax,
+    alternates: getAlternatesForPrice(item.price, item.name),
+    source: `RECEIPT DB [${item.tax}]`
+  }));
+  renderLedger();
+</script>
+</body>
+</html>

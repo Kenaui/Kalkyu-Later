@@ -653,7 +653,7 @@
       placeholder="Type price ('69.50', '4 50') or command..."
       onkeydown="if(event.key==='Enter') handleManualCommand()"
     />
-    <button class="cmd-submit" onclick="handleManualCommand()">EXEC</button>
+    <button class="cmd-submit" onclick="handleManualCommand()">CLR</button>
   </div>
 
   <!-- BOTTOM TACTILE COMMAND DECK -->
@@ -1025,7 +1025,7 @@ document.getElementById("statusText").textContent = `READY // ${priceMemoryDB.le
     localStorage.setItem("grocery_cart", JSON.stringify(cart));
 
     if (cart.length === 0) {
-      container.innerHTML = `<div class="empty-state">CART EMPTY.<br/>TAP [LOAD DB (62)] OR USE VOICE CMD.</div>`;
+      container.innerHTML = `<div class="empty-state">CART EMPTY.<br/>USE VOICE CMD OR TYPE A PRICE BELOW</div>`;
     } else {
       cart.forEach((item, idx) => {
         const lineTotal = item.price * item.qty;

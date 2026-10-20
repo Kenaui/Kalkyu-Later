@@ -1287,6 +1287,7 @@ localStorage.setItem("grocery_cart", JSON.stringify(cart));
     alert("RECEIPT COPIED TO CLIPBOARD!");
   }
 
+    // ---> REPLACE INITIAL LOAD WITH THIS <---
   const savedCart = localStorage.getItem("grocery_cart");
   if (savedCart) {
     try {

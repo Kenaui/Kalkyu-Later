@@ -20,6 +20,16 @@
       --slate: #6A6E79;
       --white: #F5F5F5;
       --font-main: 'gibed', 'Courier New', monospace;
+
+    }
+    :root {
+      /* STOLEN COLOR PALETTE FROM YOUR CLASS SCHEDULE */
+      --bg-dark: #1A1E16;        /* Deep Olive Charcoal */
+      --border-accent: #5B664B;  /* Military Olive Border */
+      --text-light: #F0F2EC;     /* Organic Off-White */
+      --gold-bronze: #8C7A32;    /* Timetable Mustard/Bronze */
+      --forest-green: #2C4230;   /* Dark Forest Green */
+      --font-main: 'Gibbed', 'Courier New', monospace;
     }
 
     * {
@@ -31,8 +41,8 @@
     }
 
     body {
-      background-color: var(--black);
-      color: var(--white);
+      background-color: var(--bg-dark);
+      color: var(--text-light);
       font-family: var(--font-main);
       display: flex;
       justify-content: center;
@@ -46,19 +56,19 @@
       height: 100dvh;
       display: flex;
       flex-direction: column;
-      background-color: var(--black);
-      border-left: 1px solid var(--slate);
-      border-right: 1px solid var(--slate);
+      background-color: var(--bg-dark);
+      border-left: 1px solid var(--border-accent);
+      border-right: 1px solid var(--border-accent);
       position: relative;
     }
 
-    /* TOP ARCHITECTURAL HEADER */
+    /* TOP HEADER */
     .top-bar {
       display: grid;
       grid-template-columns: 1fr auto;
-      border-bottom: 2px solid var(--slate);
+      border-bottom: 2px solid var(--border-accent);
       padding: 12px 16px;
-      background: var(--black);
+      background: var(--bg-dark);
     }
 
     .brand-block {
@@ -71,25 +81,25 @@
       font-size: 10px;
       letter-spacing: 1.8px;
       text-transform: uppercase;
-      color: var(--slate);
+      color: var(--border-accent);
     }
 
     .app-title {
       font-size: 19px;
       letter-spacing: 1px;
       text-transform: uppercase;
-      color: var(--white);
+      color: var(--text-light);
     }
 
     .mode-tabs {
       display: flex;
-      border: 1px solid var(--slate);
+      border: 1px solid var(--border-accent);
       align-self: center;
     }
 
     .tab-btn {
-      background: var(--black);
-      color: var(--slate);
+      background: var(--bg-dark);
+      color: var(--border-accent);
       border: none;
       padding: 7px 10px;
       font-family: var(--font-main);
@@ -100,8 +110,8 @@
     }
 
     .tab-btn.active {
-      background: var(--white);
-      color: var(--black);
+      background: var(--gold-bronze);
+      color: var(--text-light);
       font-weight: bold;
     }
 
@@ -109,17 +119,21 @@
     .summary-ticker {
       display: grid;
       grid-template-columns: 1.25fr 1fr;
-      border-bottom: 1px solid var(--slate);
-      background: var(--white);
-      color: var(--black);
+      border-bottom: 1px solid var(--border-accent);
+      background: var(--text-light);
+      color: var(--bg-dark);
     }
 
     .grand-total-box {
       padding: 14px 16px;
-      border-right: 1px solid var(--slate);
+      border-right: 1px solid var(--border-accent);
       display: flex;
       flex-direction: column;
       justify-content: center;
+    }
+
+    .grand-total-box .micro-label {
+      color: var(--border-accent);
     }
 
     .grand-total-value {
@@ -141,15 +155,15 @@
     .vat-row {
       display: flex;
       justify-content: space-between;
-      border-bottom: 1px dashed var(--slate);
+      border-bottom: 1px dashed var(--border-accent);
       padding-bottom: 2px;
       margin-bottom: 2px;
     }
 
     .vat-toggle {
       margin-top: 4px;
-      background: var(--black);
-      color: var(--white);
+      background: var(--bg-dark);
+      color: var(--text-light);
       border: none;
       padding: 4px 6px;
       font-family: var(--font-main);
@@ -163,10 +177,10 @@
     /* STATUS STRIP */
     .status-strip {
       padding: 7px 12px;
-      background: var(--black);
-      border-bottom: 1px solid var(--slate);
+      background: var(--bg-dark);
+      border-bottom: 1px solid var(--border-accent);
       font-size: 10px;
-      color: var(--white);
+      color: var(--text-light);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -182,9 +196,9 @@
     }
 
     .mini-action-btn {
-      background: var(--black);
-      color: var(--white);
-      border: 1px solid var(--slate);
+      background: var(--forest-green);
+      color: var(--text-light);
+      border: 1px solid var(--border-accent);
       padding: 3px 6px;
       font-family: var(--font-main);
       font-size: 9px;
@@ -195,15 +209,14 @@
     }
 
     .mini-action-btn:active {
-      background: var(--white);
-      color: var(--black);
+      background: var(--gold-bronze);
     }
 
     /* MAIN VIEWPORT */
     .view-container {
       flex: 1;
       overflow-y: auto;
-      background: var(--black);
+      background: var(--bg-dark);
     }
 
     .hidden {
@@ -215,14 +228,14 @@
       display: grid;
       grid-template-columns: 30px 1fr 62px 78px 28px;
       padding: 8px 10px;
-      border-bottom: 1px solid var(--slate);
+      border-bottom: 1px solid var(--border-accent);
       font-size: 10px;
-      color: var(--slate);
+      color: var(--border-accent);
       text-transform: uppercase;
       letter-spacing: 1px;
       position: sticky;
       top: 0;
-      background: var(--black);
+      background: var(--bg-dark);
       z-index: 5;
     }
 
@@ -231,12 +244,12 @@
       grid-template-columns: 30px 1fr 62px 78px 28px;
       align-items: center;
       padding: 12px 10px;
-      border-bottom: 1px solid var(--slate);
+      border-bottom: 1px solid var(--border-accent);
     }
 
     .row-idx {
       font-size: 11px;
-      color: var(--slate);
+      color: var(--border-accent);
     }
 
     .row-item-info {
@@ -249,7 +262,7 @@
 
     .row-name {
       font-size: 13px;
-      color: var(--white);
+      color: var(--text-light);
       text-transform: uppercase;
       cursor: pointer;
       white-space: nowrap;
@@ -259,7 +272,7 @@
 
     .prediction-badge {
       font-size: 9px;
-      color: var(--slate);
+      color: var(--border-accent);
       letter-spacing: 0.6px;
       text-transform: uppercase;
     }
@@ -267,9 +280,9 @@
     .alt-swap-btn {
       margin-top: 2px;
       align-self: flex-start;
-      background: transparent;
-      border: 1px solid var(--slate);
-      color: var(--white);
+      background: var(--forest-green);
+      border: 1px solid var(--border-accent);
+      color: var(--text-light);
       font-family: var(--font-main);
       font-size: 8px;
       padding: 2px 5px;
@@ -287,9 +300,9 @@
     .qty-btn {
       width: 19px;
       height: 19px;
-      background: var(--black);
-      color: var(--white);
-      border: 1px solid var(--slate);
+      background: var(--bg-dark);
+      color: var(--text-light);
+      border: 1px solid var(--border-accent);
       font-family: var(--font-main);
       cursor: pointer;
       font-size: 11px;
@@ -299,15 +312,15 @@
     .row-price {
       text-align: right;
       font-size: 13px;
-      color: var(--white);
+      color: var(--text-light);
       padding-right: 6px;
       cursor: pointer;
     }
 
     .del-btn {
       background: transparent;
-      border: 1px solid var(--slate);
-      color: var(--slate);
+      border: 1px solid var(--border-accent);
+      color: var(--border-accent);
       width: 24px;
       height: 24px;
       font-family: var(--font-main);
@@ -315,10 +328,15 @@
       font-size: 11px;
     }
 
+    .del-btn:hover {
+      background: var(--gold-bronze);
+      color: var(--bg-dark);
+    }
+
     .empty-state {
       padding: 40px 20px;
       text-align: center;
-      color: var(--slate);
+      color: var(--border-accent);
       font-size: 11px;
       line-height: 1.8;
       letter-spacing: 1px;
@@ -329,15 +347,15 @@
     .manual-bar {
       display: grid;
       grid-template-columns: 1fr auto;
-      border-top: 1px solid var(--slate);
-      border-bottom: 1px solid var(--slate);
-      background: var(--black);
+      border-top: 1px solid var(--border-accent);
+      border-bottom: 1px solid var(--border-accent);
+      background: var(--bg-dark);
     }
 
     .cmd-input {
-      background: var(--black);
+      background: var(--bg-dark);
       border: none;
-      color: var(--white);
+      color: var(--text-light);
       padding: 11px 12px;
       font-family: var(--font-main);
       font-size: 12px;
@@ -345,12 +363,12 @@
     }
 
     .cmd-input::placeholder {
-      color: var(--slate);
+      color: var(--border-accent);
     }
 
     .cmd-submit {
-      background: var(--slate);
-      color: var(--white);
+      background: var(--gold-bronze);
+      color: var(--text-light);
       border: none;
       padding: 0 14px;
       font-family: var(--font-main);
@@ -365,13 +383,13 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       height: 100px;
-      background: var(--black);
+      background: var(--bg-dark);
     }
 
     .deck-trigger {
       border: none;
-      background: var(--black);
-      color: var(--white);
+      background: var(--bg-dark);
+      color: var(--text-light);
       font-family: var(--font-main);
       display: flex;
       flex-direction: column;
@@ -382,18 +400,18 @@
     }
 
     .deck-trigger:first-child {
-      border-right: 1px solid var(--slate);
+      border-right: 1px solid var(--border-accent);
     }
 
     .deck-trigger.listening,
     .deck-trigger:active {
-      background: var(--white);
-      color: var(--black);
+      background: var(--gold-bronze);
+      color: var(--bg-dark);
     }
 
     .deck-trigger.listening .micro-label,
     .deck-trigger:active .micro-label {
-      color: var(--black);
+      color: var(--bg-dark);
     }
 
     .trigger-main-label {
@@ -407,7 +425,7 @@
     .scanner-modal {
       position: absolute;
       inset: 0;
-      background: var(--black);
+      background: var(--bg-dark);
       z-index: 50;
       display: flex;
       flex-direction: column;
@@ -416,8 +434,8 @@
     .camera-viewport {
       flex: 1;
       position: relative;
-      background: var(--black);
-      border-bottom: 1px solid var(--slate);
+      background: var(--bg-dark);
+      border-bottom: 1px solid var(--border-accent);
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -436,7 +454,7 @@
       position: absolute;
       width: 78%;
       height: 140px;
-      border: 2px solid var(--white);
+      border: 2px solid var(--text-light);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -449,20 +467,20 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
-      background: var(--black);
+      background: var(--bg-dark);
     }
 
     .scan-input-row {
       display: grid;
       grid-template-columns: 1fr auto;
-      border: 1px solid var(--slate);
+      border: 1px solid var(--border-accent);
     }
 
     .btn-block {
       width: 100%;
       padding: 14px;
-      background: var(--white);
-      color: var(--black);
+      background: var(--gold-bronze);
+      color: var(--text-light);
       border: none;
       font-family: var(--font-main);
       font-size: 13px;
@@ -475,7 +493,7 @@
     /* REPORTS VIEW */
     .report-section {
       padding: 16px;
-      border-bottom: 1px solid var(--slate);
+      border-bottom: 1px solid var(--border-accent);
     }
 
     .report-grid {
@@ -486,14 +504,15 @@
     }
 
     .stat-card {
-      border: 1px solid var(--slate);
+      border: 1px solid var(--border-accent);
       padding: 10px;
+      background: var(--forest-green);
     }
 
     .stat-val {
       font-size: 20px;
       margin-top: 4px;
-      color: var(--white);
+      color: var(--text-light);
     }
 
     .receipt-table {
@@ -505,7 +524,7 @@
 
     .receipt-table td {
       padding: 5px 0;
-      border-bottom: 1px dashed var(--slate);
+      border-bottom: 1px dashed var(--border-accent);
     }
 
     .receipt-table td:last-child {

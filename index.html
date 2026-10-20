@@ -1172,6 +1172,8 @@
     const container = document.getElementById("ledgerList");
     container.innerHTML = "";
 
+localStorage.setItem("grocery_cart", JSON.stringify(cart));
+
     if (cart.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
@@ -1285,16 +1287,25 @@
     alert("RECEIPT COPIED TO CLIPBOARD!");
   }
 
-  // Pre-load the first 6 items on startup (tap 'LOAD RECEIPT (62)' for all 62)
-  cart = priceMemoryDB.slice(0, 6).map((item, idx) => ({
-    id: idx + 1,
-    name: item.name,
-    price: item.price,
-    qty: item.defaultQty,
-    tax: item.tax,
-    alternates: getAlternatesForPrice(item.price, item.name),
-    source: `RECEIPT DB [${item.tax}]`
-  }));
+  const savedCart = localStorage.getItem("grocery_cart");
+  if (savedCart) {
+    try {
+      cart = JSON.parse(savedCart);
+    } catch (e) {
+      cart = [];
+    }
+  } else {
+    // Default fallback if no saved session exists yet
+    cart = priceMemoryDB.slice(0, 6).map((item, idx) => ({
+      id: idx + 1,
+      name: item.name,
+      price: item.price,
+      qty: item.defaultQty,
+      tax: item.tax,
+      alternates: getAlternatesForPrice(item.price, item.name),
+      source: `RECEIPT DB [${item.tax}]`
+    }));
+  }
   renderLedger();
 </script>
 </body>

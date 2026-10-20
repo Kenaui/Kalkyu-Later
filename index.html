@@ -530,7 +530,7 @@
   <!-- TOP HEADER -->
   <header class="top-bar">
     <div class="brand-block">
-      <span class="micro-label">14-DAY BI-WEEKLY CYCLE</span>
+      <span class="micro-label"  id="dbCount">Kaliweteng Langgam's</span>
       <h1 class="app-title">KALKYU-LATER</h1>
     </div>
     <div class="mode-tabs">
@@ -1019,6 +1019,8 @@
   function renderLedger() {
     const container = document.getElementById("ledgerList");
     container.innerHTML = "";
+
+document.getElementById("dbCount").textContent = `${priceMemoryDB.length}-ITEM GROCERY DB`;
 
     localStorage.setItem("grocery_cart", JSON.stringify(cart));
 

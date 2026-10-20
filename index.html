@@ -3,27 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#040504" />
+  <meta name="theme-color" content="#1A1E16" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>Kalkyu-Later</title>
+  <title>KALKYU-LATER // GROCERY LEDGER</title>
   <style>
     @font-face {
-      font-family: 'gibed';
-      src: local('gibed'), url('./gibed.otf') format('opentype'), url('./gibed.ttf') format('truetype');
+      font-family: 'Gibbed';
+      src: local('Gibbed'), url('./Gibbed.otf') format('opentype'), url('./Gibbed.ttf') format('truetype');
       font-weight: normal;
       font-style: normal;
     }
 
-    }
     :root {
-      /* STOLEN COLOR PALETTE FROM YOUR CLASS SCHEDULE */
       --bg-dark: #1A1E16;        /* Deep Olive Charcoal */
       --border-accent: #5B664B;  /* Military Olive Border */
       --text-light: #F0F2EC;     /* Organic Off-White */
       --gold-bronze: #8C7A32;    /* Timetable Mustard/Bronze */
       --forest-green: #2C4230;   /* Dark Forest Green */
-      --font-main: 'gibed', 'Courier New', monospace;
+      --font-main: 'Gibbed', 'Courier New', monospace;
     }
 
     * {
@@ -532,7 +530,7 @@
   <!-- TOP HEADER -->
   <header class="top-bar">
     <div class="brand-block">
-      <span class="micro-label">Kaliweteng Langgam's</span>
+      <span class="micro-label">14-DAY BI-WEEKLY CYCLE</span>
       <h1 class="app-title">KALKYU-LATER</h1>
     </div>
     <div class="mode-tabs">
@@ -563,15 +561,15 @@
         </div>
       </div>
       <button class="vat-toggle" id="vatModeBtn" onclick="toggleVatMode()">
-        MODE: VAT-INCLUSIVE (PH RECEIPT)
+        MODE: VAT-INCLUSIVE
       </button>
     </div>
   </section>
 
-  <!-- STATUS & QUICK RECEIPT LOADER -->
+  <!-- STATUS STRIP -->
   <div class="status-strip">
-    <span class="status-text" id="statusText">SAY "ADD 50", "ADD 82", OR "DELETE 1"</span>
-    <button class="mini-action-btn" onclick="loadFullReceiptCart()">LOAD RECEIPT (62)</button>
+    <span class="status-text" id="statusText">READY // KALKYU-LATER ACTIVE</span>
+    <button class="mini-action-btn" onclick="loadFullReceiptCart()">LOAD DB (62)</button>
     <button class="mini-action-btn" onclick="clearCart()">CLR</button>
   </div>
 
@@ -579,7 +577,7 @@
   <main class="view-container" id="ledgerView">
     <div class="ledger-header">
       <span>#</span>
-      <span>ITEM / PRICE PREDICTION</span>
+      <span>ITEM / PREDICTION</span>
       <span>QTY</span>
       <span style="text-align:right; padding-right:6px;">TOTAL</span>
       <span></span>
@@ -638,8 +636,8 @@
     </div>
 
     <div class="report-section">
-      <span class="micro-label">YOUR 62-ITEM RECEIPT DATABASE (SORTED BY PRICE)</span>
-      <div id="priceMemoryList" style="margin-top: 10px; font-size: 10px; color: var(--slate); line-height: 1.75; max-height: 220px; overflow-y: auto;"></div>
+      <span class="micro-label">62-ITEM RECEIPT DATABASE</span>
+      <div id="priceMemoryList" style="margin-top: 10px; font-size: 10px; color: var(--border-accent); line-height: 1.75; max-height: 220px; overflow-y: auto;"></div>
       <button class="btn-block" style="margin-top: 14px;" onclick="exportTripReport()">
         EXPORT / COPY RECEIPT REPORT
       </button>
@@ -652,7 +650,7 @@
       type="text"
       id="commandInput"
       class="cmd-input"
-      placeholder="Type price ('69.50', '4 50') or command ('delete 1')..."
+      placeholder="Type price ('69.50', '4 50') or command..."
       onkeydown="if(event.key==='Enter') handleManualCommand()"
     />
     <button class="cmd-submit" onclick="handleManualCommand()">EXEC</button>
@@ -683,26 +681,26 @@
     <div class="camera-viewport">
       <video id="cameraFeed" autoplay playsinline muted></video>
       <div class="reticle">
-        <span class="micro-label" style="background:var(--black); width:max-content; padding:2px 4px;">
+        <span class="micro-label" style="background:var(--bg-dark); width:max-content; padding:2px 4px;">
           ALIGN PRICE TAG OR BARCODE
         </span>
-        <span class="micro-label" id="liveScanPreview" style="background:var(--black); padding:2px 4px;">
+        <span class="micro-label" id="liveScanPreview" style="background:var(--bg-dark); padding:2px 4px;">
           AWAITING CAPTURE...
         </span>
       </div>
     </div>
 
     <div class="scanner-controls">
-      <span class="micro-label">DETECTED PRICE OR BARCODE (AUTO-PREDICTS RECEIPT ITEM)</span>
+      <span class="micro-label">DETECTED PRICE OR BARCODE</span>
       <div class="scan-input-row">
         <input
           type="text"
           id="scannedPriceInput"
           class="cmd-input"
-          placeholder="Enter price (e.g. 69.50) or barcode..."
+          placeholder="Enter price or barcode..."
           oninput="previewScannedPrediction(this.value)"
         />
-        <button class="cmd-submit" onclick="simulateOpticalTagRead()">SAMPLE TAG</button>
+        <button class="cmd-submit" onclick="simulateOpticalTagRead()">SAMPLE</button>
       </div>
       <button class="btn-block" onclick="confirmScannedItem()">
         ADD DETECTED ITEM TO LEDGER
@@ -712,13 +710,7 @@
 </div>
 
 <script>
-  /********************************************************************
-   * 1. YOUR ACTUAL 62-ITEM GROCERY RECEIPT DATABASE
-   * Extracted directly from your 2 supermarket receipt images.
-   * tax: 'V' = 12% VATable, 'E' = VAT-Exempt
-   ********************************************************************/
   const priceMemoryDB = [
-    // --- RECEIPT IMAGE 1 (45 ITEMS) ---
     { barcode: "0054928367911", price: 50.00, defaultQty: 4, tax: "V", name: "YKULT MILK 80X5 (YAKULT 5S)" },
     { barcode: "4800249005943", price: 69.50, defaultQty: 1, tax: "V", name: "ULAM BRGR CRSP220G (ULAM BURGER)" },
     { barcode: "0000008301239", price: 50.00, defaultQty: 1, tax: "E", name: "LKC ENOKI MSHRM200 (ENOKI MUSHROOM)" },
@@ -735,7 +727,7 @@
     { barcode: "4806010406072", price: 86.75, defaultQty: 1, tax: "V", name: "LS LAVA Q C-UBE30G (LAVA CAKE UBE)" },
     { barcode: "4800040342636", price: 65.50, defaultQty: 1, tax: "V", name: "FBSCO HI-RO 10S (FIBISCO HI-RO)" },
     { barcode: "8801073113893", price: 84.75, defaultQty: 1, tax: "V", name: "SMYANG H-C CAR130G (SAMYANG CARBONARA)" },
-    { barcode: "4807770270024", price: 9.00,  defaultQty: 7,tax: "V", name: "LM CHX NDLS 55 (LUCKY ME CHICKEN)" },
+    { barcode: "4807770270024", price: 9.00,  defaultQty: 7, tax: "V", name: "LM CHX NDLS 55 (LUCKY ME CHICKEN)" },
     { barcode: "4807770273704", price: 14.75, defaultQty: 1, tax: "V", name: "LM!PC ORIGINAL 80G (PANCIT CANTON)" },
     { barcode: "4807770272813", price: 15.75, defaultQty: 2, tax: "V", name: "LMLAPAZBTCHY55G (LA PAZ BATCHOY)" },
     { barcode: "8996001526200", price: 15.60, defaultQty: 2, tax: "V", name: "WOW PSTA CRBNRA80G (WOW CARBONARA)" },
@@ -764,8 +756,6 @@
     { barcode: "4800249003567", price: 85.50, defaultQty: 1, tax: "V", name: "CDOCHN LMEAT350 (CDO LUNCHEON MEAT)" },
     { barcode: "4800007011670", price: 39.50, defaultQty: 1, tax: "V", name: "STAR C-BEEF175G (STAR CORNED BEEF)" },
     { barcode: "0731126011006", price: 17.00, defaultQty: 1, tax: "V", name: "CRM C-STARCH 75G (CREAM CORNSTARCH)" },
-
-    // --- RECEIPT IMAGE 2 (17 ITEMS) ---
     { barcode: "4806502727423", price: 90.00, defaultQty: 1, tax: "V", name: "NEUBAKE WHTBRD560G (NEUBAKE BREAD)" },
     { barcode: "4800488180119", price: 23.50, defaultQty: 2, tax: "V", name: "CHRMEE WING 8S (CHARMEE WINGS 8S)" },
     { barcode: "0000008451095", price: 36.00, defaultQty: 1, tax: "V", name: "REACH CL W20SGRN-T (REACH WIPES 20S)" },
@@ -785,7 +775,6 @@
     { barcode: "4800888169693", price: 77.00, defaultQty: 2, tax: "V", name: "SSILK SH ORNG13M12 (SUNSILK 12S)" }
   ];
 
-  // Start with the first 5 items from your receipt (or tap "LOAD RECEIPT (62)" for all 62)
   let cart = [];
   let vatInclusive = true;
 
@@ -799,13 +788,13 @@
       alternates: getAlternatesForPrice(item.price, item.name),
       source: `RECEIPT DB [${item.tax}]`
     }));
-    setStatus("LOADED ALL 62 ITEMS FROM YOUR RECEIPT (₱3,670.50)");
+    setStatus("LOADED ALL 62 ITEMS FROM YOUR RECEIPT");
     renderLedger();
   }
 
   function clearCart() {
     cart = [];
-    setStatus("CART CLEARED // SAY 'ADD 50' OR 'ADD 82'");
+    setStatus("CART CLEARED");
     renderLedger();
   }
 
@@ -815,89 +804,26 @@
       .map(i => ({ name: i.name, tax: i.tax }));
   }
 
-  /********************************************************************
-   * 2. PRICE & BARCODE PREDICTION ENGINE
-   ********************************************************************/
   function predictItemFromPriceOrBarcode(inputVal) {
     const cleanStr = String(inputVal).trim();
-
-    // 1. Check Barcode Match first (if user scanned/typed 7+ digits)
     if (/^\d{7,14}$/.test(cleanStr)) {
       const byBarcode = priceMemoryDB.find(i => i.barcode.includes(cleanStr));
-      if (byBarcode) {
-        return {
-          name: byBarcode.name,
-          price: byBarcode.price,
-          tax: byBarcode.tax,
-          alternates: [],
-          method: `BARCODE MATCH`
-        };
-      }
+      if (byBarcode) return { name: byBarcode.name, price: byBarcode.price, tax: byBarcode.tax, alternates: [], method: `BARCODE MATCH` };
     }
-
     const numPrice = parseFloat(cleanStr);
-    if (isNaN(numPrice) || numPrice <= 0) {
-      return { name: "UNCLASSIFIED ITEM", price: 0, tax: "V", alternates: [], method: "MANUAL" };
-    }
+    if (isNaN(numPrice) || numPrice <= 0) return { name: "UNCLASSIFIED ITEM", price: 0, tax: "V", alternates: [], method: "MANUAL" };
 
-    // 2. Exact Unit Price Match
     const exactMatches = priceMemoryDB.filter(i => Math.abs(i.price - numPrice) < 0.01);
     if (exactMatches.length > 0) {
-      const primary = exactMatches[0];
       return {
-        name: primary.name,
+        name: exactMatches[0].name,
         price: numPrice,
-        tax: primary.tax,
+        tax: exactMatches[0].tax,
         alternates: exactMatches.slice(1).map(a => ({ name: a.name, tax: a.tax })),
-        method: exactMatches.length > 1
-          ? `EXACT ₱${numPrice.toFixed(2)} (${exactMatches.length} MATCHES)`
-          : `EXACT PRICE MATCH`
+        method: exactMatches.length > 1 ? `EXACT (${exactMatches.length} MATCHES)` : `EXACT MATCH`
       };
     }
-
-    // 3. Check if user spoke the line total (e.g. "200" for 4x50 Yakult or "63" for 7x9 Lucky Me)
-    const lineTotalMatch = priceMemoryDB.find(
-      i => i.defaultQty > 1 && Math.abs(i.price * i.defaultQty - numPrice) < 0.01
-    );
-    if (lineTotalMatch) {
-      return {
-        name: lineTotalMatch.name,
-        price: lineTotalMatch.price,
-        suggestedQty: lineTotalMatch.defaultQty,
-        tax: lineTotalMatch.tax,
-        alternates: [],
-        method: `BUNDLE MATCH (${lineTotalMatch.defaultQty}x @ ₱${lineTotalMatch.price.toFixed(2)})`
-      };
-    }
-
-    // 4. Nearest Price Neighbor within ±₱3.00 (Inflation Tolerance)
-    let closest = null;
-    let minDiff = Infinity;
-    for (const item of priceMemoryDB) {
-      const diff = Math.abs(item.price - numPrice);
-      if (diff <= 3.00 && diff < minDiff) {
-        minDiff = diff;
-        closest = item;
-      }
-    }
-
-    if (closest) {
-      return {
-        name: closest.name,
-        price: numPrice,
-        tax: closest.tax,
-        alternates: [],
-        method: `NEAR ₱${closest.price.toFixed(2)} (±₱${minDiff.toFixed(2)})`
-      };
-    }
-
-    return {
-      name: `NEW GROCERY ITEM @ ₱${numPrice.toFixed(2)}`,
-      price: numPrice,
-      tax: "V",
-      alternates: [],
-      method: "UNLISTED PRICE"
-    };
+    return { name: `ITEM @ ₱${numPrice.toFixed(2)}`, price: numPrice, tax: "V", alternates: [], method: "UNLISTED" };
   }
 
   function swapAlternateItem(cartIndex) {
@@ -907,121 +833,40 @@
     item.alternates.push({ name: item.name, tax: item.tax });
     item.name = nextAlt.name;
     item.tax = nextAlt.tax;
-    setStatus(`SWAPPED TO: ${item.name} [${item.tax}]`);
+    setStatus(`SWAPPED TO: ${item.name}`);
     renderLedger();
   }
 
-  /********************************************************************
-   * 3. VOICE & TEXT COMMAND PARSER (ADD, EDIT, DELETE)
-   ********************************************************************/
   function processCommand(rawTranscript) {
     const text = rawTranscript.toLowerCase().trim();
     if (!text) return;
 
-    // A. DELETE COMMANDS ("delete 1", "remove last", "delete coke")
     if (text.startsWith("delete") || text.startsWith("remove")) {
       if (text.includes("last") && cart.length > 0) {
-        const removed = cart.pop();
-        setStatus(`DELETED LAST: ${removed.name}`);
+        cart.pop();
         renderLedger();
         return;
       }
-      const idxMatch = text.match(/(?:item|number|#)?\s*(\d+)/);
+      const idxMatch = text.match(/\d+/);
       if (idxMatch) {
-        const idx = parseInt(idxMatch[1], 10) - 1;
-        if (cart[idx]) {
-          const removed = cart.splice(idx, 1)[0];
-          setStatus(`DELETED #${idx + 1}: ${removed.name}`);
-          renderLedger();
-          return;
-        }
-      }
-      const kw = text.replace(/delete|remove|item/g, "").trim().toUpperCase();
-      const foundIdx = cart.findIndex(i => i.name.includes(kw));
-      if (foundIdx !== -1) {
-        const removed = cart.splice(foundIdx, 1)[0];
-        setStatus(`DELETED: ${removed.name}`);
+        const idx = parseInt(idxMatch[0], 10) - 1;
+        if (cart[idx]) cart.splice(idx, 1);
         renderLedger();
         return;
       }
-      setStatus("DELETE FAILED // ITEM NOT FOUND");
-      return;
     }
 
-    // B. EDIT COMMANDS ("edit item 1 to 90", "quantity item 1 to 4")
-    if (text.startsWith("edit") || text.startsWith("change") || text.startsWith("update") || text.startsWith("quantity")) {
-      const nums = text.match(/\d+(\.\d+)?/g);
-      if (text.includes("quantity") && nums && nums.length >= 2) {
-        const idx = parseInt(nums[0], 10) - 1;
-        const newQty = parseInt(nums[1], 10);
-        if (cart[idx] && newQty > 0) {
-          cart[idx].qty = newQty;
-          setStatus(`UPDATED #${idx + 1} QTY TO ${newQty}`);
-          renderLedger();
-          return;
-        }
-      }
-      if (nums && nums.length >= 2) {
-        const idx = parseInt(nums[0], 10) - 1;
-        const newPrice = parseFloat(nums[1]);
-        if (cart[idx]) {
-          const pred = predictItemFromPriceOrBarcode(newPrice);
-          cart[idx].price = newPrice;
-          cart[idx].name = pred.name;
-          cart[idx].tax = pred.tax;
-          cart[idx].alternates = pred.alternates;
-          cart[idx].source = pred.method;
-          setStatus(`UPDATED #${idx + 1} -> ${pred.name}`);
-          renderLedger();
-          return;
-        }
-      }
-      setStatus("EDIT FORMAT: 'EDIT ITEM 1 TO 69.50'");
-      return;
-    }
-
-    // C. ADD BY VOICE OR PRICE ("add 69.50", "add 4 50", "82")
-    const normalized = text
-      .replace(/\bone\b/g, "1")
-      .replace(/\btwo\b/g, "2")
-      .replace(/\bthree\b/g, "3")
-      .replace(/\bfour\b/g, "4")
-      .replace(/\bseven\b/g, "7");
-
-    const nums = normalized.match(/\d+(\.\d+)?/g);
+    const nums = text.match(/\d+(\.\d+)?/g);
     if (!nums) {
-      // Search by spoken product keyword if no price was said (e.g., "add yakult" or "add coke")
-      const spokenKw = normalized.replace(/add|buy|grab/g, "").trim().toUpperCase();
-      const kwMatch = priceMemoryDB.find(i => i.name.includes(spokenKw));
-      if (kwMatch) {
-        cart.unshift({
-          id: Date.now(),
-          name: kwMatch.name,
-          price: kwMatch.price,
-          qty: kwMatch.defaultQty,
-          tax: kwMatch.tax,
-          alternates: getAlternatesForPrice(kwMatch.price, kwMatch.name),
-          source: "VOICE KEYWORD MATCH"
-        });
-        setStatus(`ADDED: ${kwMatch.defaultQty}x ${kwMatch.name}`);
-        renderLedger();
-        return;
-      }
-      setStatus("SAY A PRICE ('ADD 69.50') OR ITEM ('ADD COKE')");
+      setStatus("SAY A PRICE ('ADD 69.50')");
       return;
     }
-    
+
     let qty = 1;
     let rawTarget = nums[nums.length - 1];
-    if (nums.length >= 2) {
-      qty = parseInt(nums[0], 10) || 1;
-    }
+    if (nums.length >= 2) qty = parseInt(nums[0], 10) || 1;
 
     const pred = predictItemFromPriceOrBarcode(rawTarget);
-    if (pred.suggestedQty && nums.length === 1) {
-      qty = pred.suggestedQty;
-    }
-
     cart.unshift({
       id: Date.now(),
       name: pred.name,
@@ -1029,10 +874,9 @@
       qty: qty,
       tax: pred.tax,
       alternates: pred.alternates || [],
-      source: `${pred.method} [${pred.tax}]`
+      source: pred.method
     });
-
-    setStatus(`ADDED: ${qty}x ${pred.name} @ ₱${pred.price.toFixed(2)}`);
+    setStatus(`ADDED: ${qty}x ${pred.name}`);
     renderLedger();
   }
 
@@ -1043,12 +887,8 @@
     input.value = "";
   }
 
-  /********************************************************************
-   * 4. HANDS-FREE VOICE RECOGNITION
-   ********************************************************************/
   let recognition = null;
   let isListening = false;
-
   function toggleVoiceRecognition() {
     const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
     const btn = document.getElementById("voiceTrigger");
@@ -1056,7 +896,7 @@
     const subLbl = document.getElementById("voiceSubLabel");
 
     if (!SpeechRec) {
-      const fallback = prompt("Enter voice command (e.g., 'Add 69.50', 'Add 4 50', 'Delete 1'):");
+      const fallback = prompt("Enter command (e.g. '69.50' or 'delete 1'):");
       if (fallback) processCommand(fallback);
       return;
     }
@@ -1068,44 +908,30 @@
 
     recognition = new SpeechRec();
     recognition.lang = "en-PH";
-    recognition.interimResults = false;
-
     recognition.onstart = () => {
       isListening = true;
       btn.classList.add("listening");
-      subLbl.textContent = "LISTENING // SPEAK NOW";
+      subLbl.textContent = "LISTENING...";
       mainLbl.textContent = "[ STOP MIC ]";
     };
-
-    recognition.onresult = (event) => {
-      processCommand(event.results[0][0].transcript);
-    };
-
+    recognition.onresult = (e) => processCommand(e.results[0][0].transcript);
     recognition.onend = () => {
       isListening = false;
       btn.classList.remove("listening");
       subLbl.textContent = "HANDS-FREE AUDIO";
       mainLbl.textContent = "[ VOICE CMD ]";
     };
-
     recognition.start();
   }
 
-  /********************************************************************
-   * 5. OPTICAL SCANNER
-   ********************************************************************/
   let cameraStream = null;
-
   async function openScanner() {
     document.getElementById("scannerModal").classList.remove("hidden");
-    const video = document.getElementById("cameraFeed");
     try {
-      cameraStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" }
-      });
-      video.srcObject = cameraStream;
-    } catch (err) {
-      document.getElementById("liveScanPreview").textContent = "USE TAG INPUT OR SAMPLE BUTTON BELOW";
+      cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+      document.getElementById("cameraFeed").srcObject = cameraStream;
+    } catch (e) {
+      document.getElementById("liveScanPreview").textContent = "CAMERA ACCESS DENIED";
     }
   }
 
@@ -1118,83 +944,48 @@
   }
 
   function previewScannedPrediction(val) {
-    const preview = document.getElementById("liveScanPreview");
-    if (!val) {
-      preview.textContent = "AWAITING CAPTURE...";
-      return;
-    }
+    if (!val) return;
     const pred = predictItemFromPriceOrBarcode(val);
-    preview.textContent = `₱${pred.price.toFixed(2)} -> ${pred.name}`;
+    document.getElementById("liveScanPreview").textContent = `₱${pred.price.toFixed(2)} -> ${pred.name}`;
   }
 
   function simulateOpticalTagRead() {
     const sample = priceMemoryDB[Math.floor(Math.random() * priceMemoryDB.length)];
-    const input = document.getElementById("scannedPriceInput");
-    input.value = sample.price.toFixed(2);
+    document.getElementById("scannedPriceInput").value = sample.price.toFixed(2);
     previewScannedPrediction(sample.price);
   }
 
   function confirmScannedItem() {
-    const input = document.getElementById("scannedPriceInput");
-    if (!input.value.trim()) {
-      simulateOpticalTagRead();
-      return;
-    }
-    processCommand(input.value);
-    input.value = "";
+    const val = document.getElementById("scannedPriceInput").value;
+    if (val) processCommand(val);
     closeScanner();
   }
 
-  /********************************************************************
-   * 6. LEDGER RENDERING & EXACT V / E 12% VAT ENGINE
-   ********************************************************************/
   function toggleVatMode() {
     vatInclusive = !vatInclusive;
-    document.getElementById("vatModeBtn").textContent = vatInclusive
-      ? "MODE: VAT-INCLUSIVE (PH RECEIPT)"
-      : "MODE: +12% EXCLUSIVE";
+    document.getElementById("vatModeBtn").textContent = vatInclusive ? "MODE: VAT-INCLUSIVE" : "MODE: +12% EXCLUSIVE";
     renderLedger();
   }
 
-  function adjustQty(index, delta) {
-    cart[index].qty += delta;
-    if (cart[index].qty <= 0) cart.splice(index, 1);
+  function adjustQty(idx, delta) {
+    cart[idx].qty += delta;
+    if (cart[idx].qty <= 0) cart.splice(idx, 1);
     renderLedger();
   }
 
-  function deleteItem(index) {
-    cart.splice(index, 1);
+  function deleteItem(idx) {
+    cart.splice(idx, 1);
     renderLedger();
-  }
-
-  function editItemInline(index) {
-    const current = cart[index];
-    const newPriceStr = prompt(`Edit unit price for ${current.name}:`, current.price);
-    if (newPriceStr === null) return;
-    const newPrice = parseFloat(newPriceStr);
-    if (!isNaN(newPrice) && newPrice > 0) {
-      const pred = predictItemFromPriceOrBarcode(newPrice);
-      current.price = newPrice;
-      const customName = prompt(`Confirm item name for ₱${newPrice.toFixed(2)}:`, pred.name);
-      if (customName) current.name = customName.toUpperCase();
-      renderLedger();
-    }
   }
 
   function renderLedger() {
     const container = document.getElementById("ledgerList");
     container.innerHTML = "";
 
-localStorage.setItem("grocery_cart", JSON.stringify(cart));
+    localStorage.setItem("grocery_cart", JSON.stringify(cart));
 
     if (cart.length === 0) {
-      container.innerHTML = `
-        <div class="empty-state">
-          CART EMPTY.<br/>
-          TAP [LOAD RECEIPT (62)] ABOVE TO LOAD YOUR FULL LIST<br/>
-          OR SAY "ADD 50", "ADD 69.50", "ADD 190".
-        </div>
-      `;
+      container.innerHTML = `<div class="empty-state">CART EMPTY.<br/>TAP [LOAD DB (62)] OR USE VOICE CMD.</div>`;
     } else {
       cart.forEach((item, idx) => {
         const lineTotal = item.price * item.qty;
@@ -1204,68 +995,44 @@ localStorage.setItem("grocery_cart", JSON.stringify(cart));
         row.innerHTML = `
           <span class="row-idx">${String(idx + 1).padStart(2, "0")}</span>
           <div class="row-item-info">
-            <span class="row-name" onclick="editItemInline(${idx})">${item.name}</span>
+            <span class="row-name">${item.name}</span>
             <span class="prediction-badge">₱${item.price.toFixed(2)} // ${item.source}</span>
-            ${hasAlt ? `<button class="alt-swap-btn" onclick="swapAlternateItem(${idx})">SWAP ALT: ${item.alternates[0].name}</button>` : ""}
+            ${hasAlt ? `<button class="alt-swap-btn" onclick="swapAlternateItem(${idx})">SWAP: ${item.alternates[0].name}</button>` : ""}
           </div>
           <div class="qty-control">
             <button class="qty-btn" onclick="adjustQty(${idx}, -1)">-</button>
             <span>${item.qty}</span>
             <button class="qty-btn" onclick="adjustQty(${idx}, 1)">+</button>
           </div>
-          <div class="row-price" onclick="editItemInline(${idx})">₱${lineTotal.toFixed(2)} ${item.tax}</div>
+          <div class="row-price">₱${lineTotal.toFixed(2)} ${item.tax}</div>
           <button class="del-btn" onclick="deleteItem(${idx})">X</button>
         `;
         container.appendChild(row);
       });
     }
 
-    // Separate 'V' (12% VATable) and 'E' (VAT-Exempt) totals just like your supermarket receipt
-    const rawVatableTotal = cart
-      .filter(i => i.tax !== "E")
-      .reduce((sum, i) => sum + i.price * i.qty, 0);
-
-    const rawExemptTotal = cart
-      .filter(i => i.tax === "E")
-      .reduce((sum, i) => sum + i.price * i.qty, 0);
-
-    let netVatableSales = 0;
-    let vatAmount = 0;
-    let grandTotal = 0;
-
-    if (vatInclusive) {
-      netVatableSales = rawVatableTotal / 1.12;
-      vatAmount = rawVatableTotal - netVatableSales;
-      grandTotal = rawVatableTotal + rawExemptTotal;
-    } else {
-      netVatableSales = rawVatableTotal;
-      vatAmount = netVatableSales * 0.12;
-      grandTotal = netVatableSales + vatAmount + rawExemptTotal;
-    }
+    const rawVatable = cart.filter(i => i.tax !== "E").reduce((sum, i) => sum + i.price * i.qty, 0);
+    const rawExempt = cart.filter(i => i.tax === "E").reduce((sum, i) => sum + i.price * i.qty, 0);
+    const netVatable = vatInclusive ? rawVatable / 1.12 : rawVatable;
+    const vatAmount = vatInclusive ? rawVatable - netVatable : netVatable * 0.12;
+    const grandTotal = vatInclusive ? rawVatable + rawExempt : netVatable + vatAmount + rawExempt;
 
     document.getElementById("grandTotalDisplay").textContent = `₱${grandTotal.toFixed(2)}`;
-    document.getElementById("netSalesDisplay").textContent = `₱${netVatableSales.toFixed(2)}`;
-    document.getElementById("exemptSalesDisplay").textContent = `₱${rawExemptTotal.toFixed(2)}`;
+    document.getElementById("netSalesDisplay").textContent = `₱${netVatable.toFixed(2)}`;
+    document.getElementById("exemptSalesDisplay").textContent = `₱${rawExempt.toFixed(2)}`;
     document.getElementById("vatAmountDisplay").textContent = `₱${vatAmount.toFixed(2)}`;
 
     const totalUnits = cart.reduce((sum, i) => sum + i.qty, 0);
     document.getElementById("repTotalUnits").textContent = `${cart.length} / ${totalUnits}`;
     document.getElementById("repAvgCost").textContent = totalUnits > 0 ? `₱${(grandTotal / totalUnits).toFixed(2)}` : "₱0.00";
-
-    const diff = grandTotal - 3670.50;
-    document.getElementById("repVariance").textContent = `${diff >= 0 ? "+" : "-"}₱${Math.abs(diff).toFixed(2)}`;
-    document.getElementById("repRawSubtotal").textContent = `₱${(rawVatableTotal + rawExemptTotal).toFixed(2)}`;
-    document.getElementById("repVatable").textContent = `₱${netVatableSales.toFixed(2)}`;
-    document.getElementById("repExempt").textContent = `₱${rawExemptTotal.toFixed(2)}`;
+    document.getElementById("repRawSubtotal").textContent = `₱${(rawVatable + rawExempt).toFixed(2)}`;
+    document.getElementById("repVatable").textContent = `₱${netVatable.toFixed(2)}`;
+    document.getElementById("repExempt").textContent = `₱${rawExempt.toFixed(2)}`;
     document.getElementById("repVat").textContent = `₱${vatAmount.toFixed(2)}`;
     document.getElementById("repFinal").textContent = `₱${grandTotal.toFixed(2)}`;
 
-    const memContainer = document.getElementById("priceMemoryList");
-    memContainer.innerHTML = priceMemoryDB
-      .slice()
-      .sort((a, b) => a.price - b.price)
-      .map(m => `[₱${m.price.toFixed(2)} ${m.tax}] ${m.name} (x${m.defaultQty})`)
-      .join("<br/>");
+    document.getElementById("priceMemoryList").innerHTML = priceMemoryDB
+      .map(m => `[₱${m.price.toFixed(2)} ${m.tax}] ${m.name}`).join("<br/>");
   }
 
   function switchTab(tab) {
@@ -1281,43 +1048,17 @@ localStorage.setItem("grocery_cart", JSON.stringify(cart));
   }
 
   function exportTripReport() {
-    const lines = cart.map(
-      (i, idx) => `${idx + 1}. ${i.name} | ${i.qty} x ₱${i.price.toFixed(2)} = ₱${(i.qty * i.price).toFixed(2)} ${i.tax}`
-    );
-    const report = [
-      "=== BI-WEEKLY GROCERY RECEIPT ===",
-      `DATE: ${new Date().toLocaleDateString()}`,
-      "---------------------------------",
-      ...lines,
-      "---------------------------------",
-      `VATABLE SALES: ${document.getElementById("repVatable").textContent}`,
-      `VAT-EXEMPT:    ${document.getElementById("repExempt").textContent}`,
-      `12% VAT:       ${document.getElementById("repVat").textContent}`,
-      `GRAND TOTAL:   ${document.getElementById("repFinal").textContent}`
-    ].join("\n");
-
+    const report = cart.map((i, idx) => `${idx + 1}. ${i.name} (${i.qty}x ₱${i.price}) = ₱${i.qty * i.price} ${i.tax}`).join("\n");
     navigator.clipboard?.writeText(report);
-    alert("RECEIPT COPIED TO CLIPBOARD!");
+    alert("REPORT COPIED TO CLIPBOARD!");
   }
 
-    // ---> REPLACE INITIAL LOAD WITH THIS <---
-  const savedCart = localStorage.getItem("grocery_cart");
-  if (savedCart) {
-    try {
-      cart = JSON.parse(savedCart);
-    } catch (e) {
-      cart = [];
-    }
+  const saved = localStorage.getItem("grocery_cart");
+  if (saved) {
+    try { cart = JSON.parse(saved); } catch(e) { cart = []; }
   } else {
-    // Default fallback if no saved session exists yet
     cart = priceMemoryDB.slice(0, 6).map((item, idx) => ({
-      id: idx + 1,
-      name: item.name,
-      price: item.price,
-      qty: item.defaultQty,
-      tax: item.tax,
-      alternates: getAlternatesForPrice(item.price, item.name),
-      source: `RECEIPT DB [${item.tax}]`
+      id: idx + 1, name: item.name, price: item.price, qty: item.defaultQty, tax: item.tax, alternates: getAlternatesForPrice(item.price, item.name), source: `DB [${item.tax}]`
     }));
   }
   renderLedger();

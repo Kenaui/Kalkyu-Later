@@ -531,7 +531,7 @@
   <header class="top-bar">
     <div class="brand-block">
       <span class="micro-label">Kaliweteng Langgam's</span>
-      <h1 class="app-title" id="dbCount">KALKYU-LATER</h1>
+      <h1 class="app-title">KALKYU-LATER</h1>
     </div>
     <div class="mode-tabs">
       <button class="tab-btn active" id="tabLedger" onclick="switchTab('ledger')">LIST</button>
@@ -1020,7 +1020,7 @@
     const container = document.getElementById("ledgerList");
     container.innerHTML = "";
 
-document.getElementById("dbCount").textContent = `${priceMemoryDB.length}-ITEM GROCERY DB`;
+document.getElementById("statusText").textContent = `READY // ${priceMemoryDB.length}-ITEM DB ACTIVE`;
 
     localStorage.setItem("grocery_cart", JSON.stringify(cart));
 
